@@ -1,0 +1,128 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+package com.microsoft.azure.sdk.iot.provisioning.service.configs;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.microsoft.azure.sdk.iot.provisioning.service.Tools;
+
+/**
+ * Representation of a single Device Provisioning Service Symmetric Key Attestation.
+ *
+ * <p> The provisioning service supports Symmetric Key attestation as the device attestation mechanism.
+ *     User can auto-generate the Primary and Secondary keys, or provide the values in Base64 format.
+ *
+ * @see <a href="https://docs.microsoft.com/en-us/rest/api/iot-dps/deviceenrollment">Device Enrollment</a>
+ * @see <a href="https://docs.microsoft.com/en-us/azure/iot-dps/concepts-symmetric-key-attestation">Symmetric Key Attestation</a>
+ */
+public class SymmetricKeyAttestation extends Attestation
+{
+    // the primary key for attestation [mandatory]
+    private static final String PRIMARY_KEY_TAG = "primaryKey";
+    @Expose(serialize = true, deserialize = true)
+    @SerializedName(PRIMARY_KEY_TAG)
+    private String primaryKey;
+
+    // the secondary key for attestation [mandatory]
+    private static final String SECONDARY_KEY_TAG = "secondaryKey";
+    @Expose(serialize = true, deserialize = true)
+    @SerializedName(SECONDARY_KEY_TAG)
+    private String secondaryKey;
+
+    /**
+     * CONSTRUCTOR
+     *
+     * <p> This function will create a new instance of the Symmetric Key attestation with primary and secondary keys.
+     *     Both the keys are mandatory.
+     *
+     * @param primaryKey the {@code String} with the Symmetric Key attestation primary key. It cannot be {@code null} or empty.
+     * @param secondaryKey the {@code String} with the Symmetric Key attestation secondary key. It cannot be {@code null} or empty.
+     * @throws IllegalArgumentException If either the primary key or the secondary key is {@code null} or empty.
+     */
+    public SymmetricKeyAttestation(String primaryKey, String secondaryKey)
+    {
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_001: [The constructor shall throw IllegalArgumentException if the provided primary key is null or empty.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_002: [The constructor shall store the provided primary key.] */
+        this.setPrimaryKey(primaryKey);
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_003: [The constructor shall throw IllegalArgumentException if the provided secondary key is null or empty.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_004: [The constructor shall store the provided secondary key.] */
+        this.setSecondaryKey(secondaryKey);
+    }
+
+    /**
+     * CONSTRUCTOR (COPY)
+     *
+     * <p>
+     *     This function will create a new instance of the Symmetric Key attestation copying
+     *     the primaryKey and secondaryKey from the provided attestation.
+     * </p>
+     *
+     * @param symmetricKeyAttestation the original {@code SymmetricKeyAttestation} to copy. It cannot be {@code null}.
+     * @throws IllegalArgumentException if the provided symmetricKey is {@code null}.
+     */
+    public SymmetricKeyAttestation(SymmetricKeyAttestation symmetricKeyAttestation)
+    {
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_005: [The constructor shall throw IllegalArgumentException if the provided symmetricKey is null.] */
+        if(symmetricKeyAttestation == null)
+        {
+            throw new IllegalArgumentException("Symmetric Key Attestation cannot be null");
+        }
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_006: [The constructor shall store the primaryKey and secondaryKey provided in the symmetricKey.] */
+        this.setPrimaryKey(symmetricKeyAttestation.primaryKey);
+        this.setSecondaryKey(symmetricKeyAttestation.secondaryKey);
+    }
+
+    /**
+     * Getter for the primaryKey.
+     *
+     * @return The {@code String} with the stored primaryKey. It cannot be {@code null} or empty.
+     */
+    public String getPrimaryKey()
+    {
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_007: [The getPrimaryKey shall return the stored primary key.] */
+        return this.primaryKey;
+    }
+
+    /**
+     * Getter for the secondaryKey.
+     *
+     * @return The {@code String} with the stored secondaryKey. It cannot be {@code null} or empty.
+     */
+    public String getSecondaryKey()
+    {
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_008: [The getSecondaryKey shall return the stored secondary key.] */
+        return this.secondaryKey;
+    }
+
+    private void setPrimaryKey(String primaryKey)
+    {
+        if(Tools.isNullOrEmpty(primaryKey))
+        {
+            throw new IllegalArgumentException("primaryKey cannot be null or empty.");
+        }
+        this.primaryKey = primaryKey;
+    }
+
+    private void setSecondaryKey(String secondaryKey)
+    {
+        if(Tools.isNullOrEmpty(secondaryKey))
+        {
+            throw new IllegalArgumentException("secondaryKey cannot be null or empty.");
+        }
+        this.secondaryKey = secondaryKey;
+    }
+
+    /**
+     * Empty constructor
+     *
+     * <p>
+     *     Used only by the tools that will deserialize this class.
+     * </p>
+     */
+    @SuppressWarnings("unused")
+    SymmetricKeyAttestation()
+    {
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_009: [The SymmetricKeyAttestation shall provide an empty constructor to make GSON happy.] */
+    }
+}

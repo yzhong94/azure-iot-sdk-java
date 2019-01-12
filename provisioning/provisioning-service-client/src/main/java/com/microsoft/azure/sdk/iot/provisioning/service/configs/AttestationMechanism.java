@@ -17,7 +17,7 @@ import com.microsoft.azure.sdk.iot.provisioning.service.exceptions.ProvisioningS
  */
 public final class AttestationMechanism
 {
-    // The AttestationMechanismType that identifies if the attestation is TPM (TpmAttestation) or X509 (X509Attestation).
+    // The AttestationMechanismType that identifies if the attestation is TPM (TpmAttestation), X509 (X509Attestation) or Symmetric Keys (SymmetricKeysAttestation).
     private static final String ATTESTATION_TYPE_TAG = "type";
     @Expose(serialize = true, deserialize = true)
     @SerializedName(ATTESTATION_TYPE_TAG)
@@ -35,12 +35,18 @@ public final class AttestationMechanism
     @SerializedName(X509_ATTESTATION_TAG)
     private X509Attestation x509;
 
+    // This is the SymmetricKeyAttestation that contains the Symmetric Keys. It is valid on AttestationMechanismType.SYMMETRIC_KEY.
+    private static final String SYMMETRIC_KEY_TAG = "symmetricKey";
+    @Expose(serialize = true, deserialize = true)
+    @SerializedName(SYMMETRIC_KEY_TAG)
+    private SymmetricKeyAttestation symmetricKey;
+
     /**
      * CONSTRUCTOR
      *
      * <p> It will create a new instance of the AttestationMechanism for the provided attestation type.
      *
-     * @param attestation the {@code Attestation} with the TPM keys or X509 certificates. It cannot be {@code null}.
+     * @param attestation the {@code Attestation} with the TPM keys, X509 certificates or Symmetric Keys. It cannot be {@code null}.
      * @throws IllegalArgumentException If the provided tpm is {@code null}.
      */
     AttestationMechanism(Attestation attestation)
@@ -57,6 +63,8 @@ public final class AttestationMechanism
             this.tpm = new TpmAttestation((TpmAttestation)attestation);
             /* SRS_ATTESTATION_MECHANISM_21_004: [If the provided attestation is instance of TpmAttestation, the constructor shall set the x508 as null.] */
             this.x509 = null;
+            /* SRS_ATTESTATION_MECHANISM_014: [If the provided attestation is instance of TpmAttestation, the constructor shall set the symmetricKey as null.] */
+            this.symmetricKey = null;
             /* SRS_ATTESTATION_MECHANISM_21_003: [If the provided attestation is instance of TpmAttestation, the constructor shall set the attestation type as TPM.] */
             this.type = AttestationMechanismType.TPM;
         }
@@ -66,8 +74,21 @@ public final class AttestationMechanism
             this.x509 = new X509Attestation((X509Attestation)attestation);
             /* SRS_ATTESTATION_MECHANISM_21_008: [If the provided attestation is instance of X509Attestation, the constructor shall set the tpm as null.] */
             this.tpm = null;
+            /* SRS_ATTESTATION_MECHANISM_015: [If the provided attestation is instance of X509Attestation, the constructor shall set the symmetricKey as null.] */
+            this.symmetricKey = null;
             /* SRS_ATTESTATION_MECHANISM_21_007: [If the provided attestation is instance of X509Attestation, the constructor shall set the attestation type as X509.] */
             this.type = AttestationMechanismType.X509;
+        }
+        else if(attestation instanceof SymmetricKeyAttestation)
+        {
+            /* SRS_ATTESTATION_MECHANISM_016: [If the provided attestation is instance of SymmetricKeyAttestation, the constructor shall store the provided symmetric keys.] */
+            this.symmetricKey = new SymmetricKeyAttestation((SymmetricKeyAttestation)attestation);
+            /* SRS_ATTESTATION_MECHANISM_017: [If the provided attestation is instance of SymmetricKeyAttestation, the constructor shall set the tpm as null.] */
+            this.tpm = null;
+            /* SRS_ATTESTATION_MECHANISM_018: [If the provided attestation is instance of SymmetricKeyAttestation, the constructor shall set the x509 as null.] */
+            this.x509 = null;
+            /* SRS_ATTESTATION_MECHANISM_019: [If the provided attestation is instance of SymmetricKeyAttestation, the constructor shall set the attestation type as SYMMETRIC_KEY.] */
+            this.type = AttestationMechanismType.SYMMETRIC_KEY;
         }
         else
         {
@@ -103,8 +124,11 @@ public final class AttestationMechanism
             case X509:
                 /* SRS_ATTESTATION_MECHANISM_21_011: [If the type is `X509`, the getAttestation shall return the stored X509Attestation.] */
                 return new X509Attestation(this.x509);
+            case SYMMETRIC_KEY:
+                /* SRS_ATTESTATION_MECHANISM_020: [If the type is `SYMMETRIC_KEY`, the getAttestation shall return the stored SymmetricKeyAttestation.] */
+                return new SymmetricKeyAttestation(this.symmetricKey);
             default:
-                /* SRS_ATTESTATION_MECHANISM_21_012: [If the type is not `X509` or `TPM`, the getAttestation shall throw ProvisioningServiceClientException.] */
+                /* SRS_ATTESTATION_MECHANISM_21_012: [If the type is not `X509`, `TPM` or 'SYMMETRIC_KEY', the getAttestation shall throw ProvisioningServiceClientException.] */
                 throw new ProvisioningServiceClientException("Unknown attestation mechanism");
         }
     }
