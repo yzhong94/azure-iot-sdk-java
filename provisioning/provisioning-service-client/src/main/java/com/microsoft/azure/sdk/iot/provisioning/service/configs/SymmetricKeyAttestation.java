@@ -30,6 +30,8 @@ public class SymmetricKeyAttestation extends Attestation
     @SerializedName(SECONDARY_KEY_TAG)
     private String secondaryKey;
 
+    private static final String EMPTY_STRING = "";
+
     /**
      * CONSTRUCTOR
      *
@@ -42,11 +44,9 @@ public class SymmetricKeyAttestation extends Attestation
      */
     public SymmetricKeyAttestation(String primaryKey, String secondaryKey)
     {
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_001: [The constructor shall throw IllegalArgumentException if the provided primary key is null or empty.] */
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_002: [The constructor shall store the provided primary key.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_001: [The constructor shall store the provided primary key.] */
         this.setPrimaryKey(primaryKey);
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_003: [The constructor shall throw IllegalArgumentException if the provided secondary key is null or empty.] */
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_004: [The constructor shall store the provided secondary key.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_002: [The constructor shall store the provided secondary key.] */
         this.setSecondaryKey(secondaryKey);
     }
 
@@ -63,14 +63,18 @@ public class SymmetricKeyAttestation extends Attestation
      */
     public SymmetricKeyAttestation(SymmetricKeyAttestation symmetricKeyAttestation)
     {
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_005: [The constructor shall throw IllegalArgumentException if the provided symmetricKey is null.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_003: [The service will generate symmetric keys if the symmetricKeyAttestation supplied is null or empty.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_004: [The constructor shall store the primaryKey and secondaryKey provided in the symmetricKey.] */
         if(symmetricKeyAttestation == null)
         {
-            throw new IllegalArgumentException("Symmetric Key Attestation cannot be null");
+            this.setPrimaryKey(EMPTY_STRING);
+            this.setSecondaryKey(EMPTY_STRING);
         }
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_006: [The constructor shall store the primaryKey and secondaryKey provided in the symmetricKey.] */
-        this.setPrimaryKey(symmetricKeyAttestation.primaryKey);
-        this.setSecondaryKey(symmetricKeyAttestation.secondaryKey);
+        else
+        {
+            this.setPrimaryKey(symmetricKeyAttestation.primaryKey);
+            this.setSecondaryKey(symmetricKeyAttestation.secondaryKey);
+        }
     }
 
     /**
@@ -80,7 +84,7 @@ public class SymmetricKeyAttestation extends Attestation
      */
     public String getPrimaryKey()
     {
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_007: [The getPrimaryKey shall return the stored primary key.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_005: [The getPrimaryKey shall return the stored primary key.] */
         return this.primaryKey;
     }
 
@@ -91,25 +95,17 @@ public class SymmetricKeyAttestation extends Attestation
      */
     public String getSecondaryKey()
     {
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_008: [The getSecondaryKey shall return the stored secondary key.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_006: [The getSecondaryKey shall return the stored secondary key.] */
         return this.secondaryKey;
     }
 
     private void setPrimaryKey(String primaryKey)
     {
-        if(Tools.isNullOrEmpty(primaryKey))
-        {
-            throw new IllegalArgumentException("primaryKey cannot be null or empty.");
-        }
         this.primaryKey = primaryKey;
     }
 
     private void setSecondaryKey(String secondaryKey)
     {
-        if(Tools.isNullOrEmpty(secondaryKey))
-        {
-            throw new IllegalArgumentException("secondaryKey cannot be null or empty.");
-        }
         this.secondaryKey = secondaryKey;
     }
 
@@ -123,6 +119,6 @@ public class SymmetricKeyAttestation extends Attestation
     @SuppressWarnings("unused")
     SymmetricKeyAttestation()
     {
-        /* SRS_SYMMETRIC_KEY_ATTESTATION_009: [The SymmetricKeyAttestation shall provide an empty constructor to make GSON happy.] */
+        /* SRS_SYMMETRIC_KEY_ATTESTATION_007: [The SymmetricKeyAttestation shall provide an empty constructor to make GSON happy.] */
     }
 }
